@@ -2,7 +2,7 @@ import networkx as nx
 from networkx.algorithms import tree
 
 from functools import partial
-from .random import random
+from .random_2 import random
 from collections import deque, namedtuple
 from typing import Any, Callable, Dict, List, Optional, Set, Union, Sequence
 

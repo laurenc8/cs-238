@@ -1,5 +1,5 @@
 from functools import partial
-from ..random import random
+from ..random_2 import random
 
 from ..tree import (
     recursive_tree_part, bipartition_tree, bipartition_tree_random,

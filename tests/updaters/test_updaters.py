@@ -8,7 +8,7 @@ from gerrychain.constraints import Validator, no_vanishing_districts
 from gerrychain.graph import Graph
 from gerrychain.partition import Partition
 from gerrychain.proposals import propose_random_flip
-from gerrychain.random import random
+from gerrychain.random_2 import random
 from gerrychain.updaters import (Election, Tally, boundary_nodes, cut_edges,
                                  cut_edges_by_part, exterior_boundaries,
                                  exterior_boundaries_as_a_set,

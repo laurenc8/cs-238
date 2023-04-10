@@ -1,7 +1,7 @@
 import pytest
 
 from gerrychain import Graph, Partition
-from gerrychain.random import random
+from gerrychain.random_2 import random
 from gerrychain.updaters import cut_edges
 import networkx
 
