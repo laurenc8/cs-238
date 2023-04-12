@@ -9,7 +9,7 @@ def community_comparison(partition: Partition) -> bool:
     df = pd.DataFrame.from_dict(partition.graph.nodes._nodes, orient='index')
     assign = pd.DataFrame(partition.assignment)
     final_df = df.merge(assign, left_index=True, right_index=True)
-    return lauren_function(final_df) > 1;
+    return True; lauren_function(final_df) > 1;
 
 def cut_edge_accept(partition: Partition) -> bool:
     """Always accepts the flip if the number of cut_edges increases.

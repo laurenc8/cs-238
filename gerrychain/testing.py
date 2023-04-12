@@ -6,15 +6,15 @@ from gerrychain.proposals import recom
 from functools import partial
 import pandas
 import networkx as nx
+from pcompress import Record
 
-graph = Graph.from_json("../docs/user/PA_VTDs.json")
+# for partition in Record(chain, "pa-run.chain"):
+
+
+graph = Graph.from_json("../docs/user/michigan_dualgraph.json")
 
 elections = [
-    Election("SEN10", {"Democratic": "SEN10D", "Republican": "SEN10R"}),
-    Election("SEN12", {"Democratic": "USS12D", "Republican": "USS12R"}),
-    Election("SEN16", {"Democratic": "T16SEND", "Republican": "T16SENR"}),
-    Election("PRES12", {"Democratic": "PRES12D", "Republican": "PRES12R"}),
-    Election("PRES16", {"Democratic": "T16PRESD", "Republican": "T16PRESR"})
+    Election("SEN18", {"Democratic": "SEN18D", "Republican": "SEN18R"})
 ]
 
 # Population updater, for computing how close to equality the district
@@ -26,7 +26,8 @@ my_updaters = {"population": updaters.Tally("TOTPOP", alias="population")}
 election_updaters = {election.name: election for election in elections}
 my_updaters.update(election_updaters)
 
-initial_partition = GeographicPartition(graph, assignment="CD_2011", updaters=my_updaters)
+assignment = {n : graph.nodes[n]["CD"] for n in graph.nodes}
+initial_partition = GeographicPartition(graph, assignment=assignment, updaters=my_updaters)
 
 # The ReCom proposal needs to know the ideal population for the districts so that
 # we can improve speed by bailing early on unbalanced partitions.
@@ -60,11 +61,15 @@ chain = MarkovChain(
     total_steps=1000
 )
 
+for partition in Record(chain, "michigan-run.chain"):
+    print('partition', partition)
+
+
 # This will take about 10 minutes.
-data = pandas.DataFrame(
-    sorted(partition["SEN12"].percents("Democratic"))
-    for partition in chain
-)
+# data = pandas.DataFrame(
+#     sorted(partition["SEN18"].percents("Democratic"))
+#     for partition in chain
+# )
 
 # fig, ax = plt.subplots(figsize=(8, 6))
 #
