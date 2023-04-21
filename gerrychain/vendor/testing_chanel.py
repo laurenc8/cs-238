@@ -4,14 +4,13 @@ from gerrychain.updaters import Tally, cut_edges
 import matplotlib.pyplot as plt
 from gerrychain.proposals import recom
 from functools import partial
-import pandas
+import pandas as pd
 import networkx as nx
-from pcompress import Record
 
 # for partition in Record(chain, "pa-run.chain"):
 
 
-graph = Graph.from_json("../docs/user/michigan_dualgraph.json")
+graph = Graph.from_json("../../docs/user/michigan_dualgraph.json")
 
 elections = [
     Election("SEN18", {"Democratic": "SEN18D", "Republican": "SEN18R"})
@@ -27,13 +26,12 @@ election_updaters = {election.name: election for election in elections}
 my_updaters.update(election_updaters)
 
 assignment = {n : graph.nodes[n]["CD"] for n in graph.nodes}
-initial_partition = GeographicPartition(graph, assignment=assignment, updaters=my_updaters)
+initial_partition = Partition(graph, assignment=assignment, updaters=my_updaters)
 
 # The ReCom proposal needs to know the ideal population for the districts so that
 # we can improve speed by bailing early on unbalanced partitions.
 
 ideal_population = sum(initial_partition["population"].values()) / len(initial_partition)
-
 # We use functools.partial to bind the extra parameters (pop_col, pop_target, epsilon, node_repeats)
 # of the recom proposal.
 proposal = partial(recom,
@@ -60,11 +58,23 @@ chain = MarkovChain(
     initial_state=initial_partition,
     total_steps=1000
 )
+print('made chain')
 
-# for partition in Record(chain, "michigan-run.chain"):
-#     print('start of this round')
-#     print('partition', partition)
-#     print('done this round?')
+ensemble_df = pd.DataFrame(columns=["nodes"] + list(range(1000)))
+first_time = True
+for i, partition in enumerate(chain):
+  part_series = partition.assignment.to_series().sort_index()
+  ensemble_df[i] = list(part_series)
+  if first_time:
+     ensemble_df["nodes"] = list(part_series.index)
+     print(ensemble_df["nodes"])
+     first_time = False
+
+print("going to print to df")
+ensemble_df.to_csv("../../docs/user/michigan_ensemble.csv", index=False)
+
+#for partition in Record(chain, "michigan-run.chain", executable="pv", extreme=True):
+#    print('partition', partition)
 
 
 # This will take about 10 minutes.
