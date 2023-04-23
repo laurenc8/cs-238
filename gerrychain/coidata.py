@@ -1,16 +1,33 @@
+import geopandas as gpd
+import matplotlib.pyplot as plt
+import pandas as pd
+import json
 from gerrychain import (GeographicPartition, Partition, Graph, MarkovChain,
                         proposals, updaters, constraints, accept, Election)
-from gerrychain.updaters import Tally, cut_edges
-import matplotlib.pyplot as plt
-from gerrychain.proposals import recom
-from functools import partial
-import pandas as pd
-import networkx as nx
 
-# for partition in Record(chain, "pa-run.chain"):
+df_coi = gpd.read_file('shp_data/coi-products/Michigan/shapefile_summary/MI_20211207_phase_C_summary/MI_20211207_phase_C_summary.shp')
+print(df_coi.head())
+# print(len(df))
+# print(df.columns)
+# df.plot("cluster", legend=True)
 
+mi_precinct = gpd.read_file('shp_data/MI/mi16_results.shp')
+print(mi_precinct.columns)
 
-graph = Graph.from_json("../../docs/user/michigan_dualgraph.json")
+df_coi2 = df_coi.to_crs("epsg:6493") #(epsg=6493, inplace=True, allow_override=True)
+
+how = 'left'
+pred = 'within'
+mi_coi_precinct = mi_precinct.sjoin(df_coi2, how=how, predicate=pred)
+# mi_coi_precinct.to_csv(f'COMBINED_{how}_{pred}.csv')
+
+print(mi_coi_precinct.head())
+print(mi_coi_precinct.index)
+mi_coi_precinct['ind'] = mi_coi_precinct.index
+print(mi_coi_precinct.drop_duplicates(subset=['ind']))
+
+graph = Graph.from_geodataframe(mi_coi_precinct)
+
 
 elections = [
     Election("SEN18", {"Democratic": "SEN18D", "Republican": "SEN18R"})
@@ -74,35 +91,19 @@ for i, partition in enumerate(chain):
      print(ensemble_df["nodes"])
      first_time = False
 
-print("going to print to df")
-ensemble_df.to_csv("../../docs/user/michigan_ensemble.csv", index=False)
 
-#for partition in Record(chain, "michigan-run.chain", executable="pv", extreme=True):
-#    print('partition', partition)
+# # michigan_cd = pd.read_json('../docs/user/michigan_dualgraph.json')
+# with open('../docs/user/michigan_dualgraph.json') as json_data:
+#     data = json.load(json_data)
+#     print(data.keys())
+#     # print('specific column', data['nodes']) #idk what adjacency is
+#     dfn = pd.DataFrame(data['nodes'])
+#     print(dfn.columns)
+#
+# # print(michigan_cd)
+#
+# # cities_with_country = cities.sjoin(countries, how="inner", predicate='intersects')
+#
+# # plt.show()
+#
 
-
-# This will take about 10 minutes.
-# data = pandas.DataFrame(
-#     sorted(partition["SEN18"].percents("Democratic"))
-#     for partition in chain
-# )
-
-# fig, ax = plt.subplots(figsize=(8, 6))
-#
-# # Draw 50% line
-# ax.axhline(0.5, color="#cccccc")
-#
-# # Draw boxplot
-# data.boxplot(ax=ax, positions=range(len(data.columns)))
-#
-# # Draw initial plan's Democratic vote %s (.iloc[0] gives the first row)
-# plt.plot(data.iloc[0], "ro")
-#
-# # Annotate
-# ax.set_title("Comparing the 2011 plan to an ensemble")
-# ax.set_ylabel("Democratic vote % (Senate 2012)")
-# ax.set_xlabel("Sorted districts")
-# ax.set_ylim(0, 1)
-# ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
-#
-# plt.show()
