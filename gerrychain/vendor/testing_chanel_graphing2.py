@@ -6,11 +6,15 @@ from gerrychain.proposals import recom
 from functools import partial
 import pandas as pd
 import networkx as nx
+import geopandas as gpd
+import numpy as np
 
 # for partition in Record(chain, "pa-run.chain"):
 
 
-graph = Graph.from_json("../../docs/user/michigan_dualgraph.json")
+# graph = Graph.from_json("../../docs/user/michigan_dualgraph.json")
+df = gpd.read_file('../shp_data/MI/mi16_results.shp')
+graph = Graph.from_geodataframe(df)
 
 elections = [
     Election("SEN18", {"Democratic": "SEN18D", "Republican": "SEN18R"})
@@ -27,10 +31,6 @@ my_updaters.update(election_updaters)
 
 assignment = {n : graph.nodes[n]["CD"] for n in graph.nodes}
 initial_partition = GeographicPartition(graph, assignment=assignment, updaters=my_updaters)
-
-initial_partition.plot(graph, figsize=(10, 10), cmap="tab20")
-plt.axis('off')
-plt.show()
 
 # The ReCom proposal needs to know the ideal population for the districts so that
 # we can improve speed by bailing early on unbalanced partitions.
@@ -62,7 +62,12 @@ chain = MarkovChain(
     initial_state=initial_partition,
     total_steps=1000
 )
-print('made chain')
+
+np.savetxt("community_scores.csv",
+           chain.all_cscores,
+           delimiter =", ",
+           fmt ='% s')
+
 
 ensemble_df = pd.DataFrame(columns=["nodes"] + list(range(1000)))
 first_time = True

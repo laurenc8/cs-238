@@ -3,7 +3,7 @@ from typing import Union, Iterable, Callable, Optional
 
 from gerrychain.constraints import Bounds
 from gerrychain.partition import Partition
-
+import matplotlib.pyplot as plt
 
 class MarkovChain:
     """
@@ -63,6 +63,7 @@ class MarkovChain:
         self.total_steps = total_steps
         self.initial_state = initial_state
         self.state = initial_state
+        self.all_cscores = []
 
     def __iter__(self) -> 'MarkovChain':
         self.counter = 0
@@ -81,8 +82,14 @@ class MarkovChain:
                 self.state.parent = None
 
             if self.is_valid(proposed_next_state):
-                if self.accept(proposed_next_state, self.state):
+                cs_1, community_score, cs_old = self.accept(proposed_next_state, self.state)
+                print(community_score)
+                if cs_1:
+                    # proposed_next_state.plot(figsize=(10, 10), cmap="BuPu", legend=True)
+                    # plt.axis("off")
+                    # plt.show()
                     self.state = proposed_next_state
+                    self.all_cscores.append(community_score)
                 self.counter += 1
                 return self.state
         raise StopIteration
