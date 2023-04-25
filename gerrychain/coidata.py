@@ -30,6 +30,7 @@ print(just_CDs.columns)
 
 just_CDs.plot(ax=base, cmap="Pastel2", zorder=2, facecolor="none", edgecolor="black")
 # mi_coi_precinct3.plot(column='cluster', cmap="Pastel1", facecolor="none") #, edgecolor="black"
-plt.
 plt.axis("off")
+plt.title()
 plt.show()
+plt.savefig('images/Cond_Entr_1.png', dpi=300)

@@ -77,9 +77,9 @@ for i, partition in enumerate(chain):
      first_time = False
 
 print("going to print to df")
-ensemble_df.to_csv("../../docs/user/michigan_acceptall_1000.csv", index=False)
+ensemble_df.to_csv("../../docs/user/michigan_acceptall_1000_3.csv", index=False)
 
-np.savetxt("community_scores_acceptall_1000.csv",
+np.savetxt("community_scores_acceptall_1000_3.csv",
            chain.all_cscores,
            delimiter =", ",
            fmt ='% s')
